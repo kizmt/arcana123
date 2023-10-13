@@ -56,6 +56,7 @@
     // controls.enableZoom = false
     controls.enabled = false
     // const gui = new dat.GUI();
+    
 
 
 
@@ -172,8 +173,8 @@ renderer.physicallyCorrectLights = false;
     }
 
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);  // Decreased intensity to 0.2
-    scene.add(ambientLight);    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4); // Increased intensity to 0.5
+    scene.add(ambientLight);       
     
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);  // Decreased intensity to 0.4
     directionalLight.position.set(2, 2, 5);  
@@ -218,8 +219,8 @@ new RGBELoader()
         // Traverse the model and update materials
         model.traverse((child) => {
             if (child.isMesh) {
-                child.material.roughness = 0.4;  // Increased roughness
-                child.material.metalness = 0.5;  // Increased metalness
+                child.material.roughness = 0.6;  // Increased roughness
+                child.material.metalness = 0.8;  // Increased metalness
                 child.material.needsUpdate = true;
             }
         });
@@ -239,7 +240,7 @@ new RGBELoader()
             stick.rotation.set(0, -Math.PI / 4, 0);
         }
     
-        model.position.set(1, 0, 4.3); // Adjusted the z-value to bring the model closer
+        model.position.set(0.8, 0, 4.4); // Adjusted the z-value to bring the model closer
         scene.add(gltf.scene);
         let time = 1.8; // reduced from 3 to 1.5 for a faster animation
         let delay = 0;
