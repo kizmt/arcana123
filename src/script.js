@@ -59,16 +59,23 @@
 
 
 
-    /**
-     * Renderer
-     */
-    const renderer = new THREE.WebGLRenderer({
-        canvas: canvas,
-        antialias: true,
-        alpha:true
-    })
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+/**
+ * Renderer
+ */
+const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    alpha:true
+});
+renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// Updated Snippet:
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.5;  // Adjust this value to control exposure
+renderer.physicallyCorrectLights = false;
+
 
     // Create a particle system in the shape of small spheres
     const particleCount = 2000;
@@ -147,7 +154,7 @@
     scene.add(particles,particles2);
 
     // Create an animation
-    const explosionSpeed = 0.001;
+    const explosionSpeed = 0.005;
     const targetPositions = [];
     const targetPositions2 = [];
 
@@ -165,13 +172,19 @@
     }
 
 
-    const ambientLight = new THREE.AmbientLight('white',1)
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1);
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.1);
-    directionalLight.position.set(0, 1, 5); 
-    directionalLight2.position.set(0, -2, 5); 
-    scene.add(directionalLight,directionalLight2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);  // Decreased intensity to 0.2
+    scene.add(ambientLight);    
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);  // Decreased intensity to 0.4
+    directionalLight.position.set(2, 2, 5);  
+    scene.add(directionalLight);
+    
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);  // Decreased intensity to 0.4
+    directionalLight2.position.set(-2, -2, 5);  
+    scene.add(directionalLight2);
+    
+    
+    
 new RGBELoader()
     .setDataType(THREE.UnsignedByteType)
     .load('/potsdamer_platz_4k.hdr', (texture) => {
@@ -202,12 +215,18 @@ new RGBELoader()
         right = gltf.scene.getObjectByName('Lập_Phương018')
         left = gltf.scene.getObjectByName('Lập_Phương020')
         stick = gltf.scene.getObjectByName('Lập_Phương025')
-        // const part1 = gltf.scene.getObjectByName('Lập_Phương017');
-        // scene.add(left,right,head,stick)
+        // Traverse the model and update materials
+        model.traverse((child) => {
+            if (child.isMesh) {
+                child.material.roughness = 0.5;  // Increased roughness
+                child.material.metalness = 0.3;  // Increased metalness
+                child.material.needsUpdate = true;
+            }
+        });
         model.scale.set(0.01,0.01,0.01)
-        model.position.set(0,0,3)
+        model.position.set(0,0,4.3);  // Adjusted the z-value to bring the model closer
         scene.add(gltf.scene);
-        let time = 3
+        let time = 1.8;  // reduced from 3 to 1.5 for a faster animation
         let delay = 0
         gsap.to(head.position,time,{
             x:0,
@@ -232,9 +251,9 @@ new RGBELoader()
             y:0,
             z:0,
             delay:delay
-  
+    
           })
-
+    
         model.mixer = mixer;
     },
     function ( xhr ) {
@@ -243,8 +262,9 @@ new RGBELoader()
         setTimeout(() => {
             document.querySelector('.loader').style.display = 'none'
         }, 1000);
-
-    },);
+    
+    });
+    
 
 
     // let inervalId = setInterval(e=>{
@@ -260,85 +280,72 @@ new RGBELoader()
     // }
     // },10)
 
-  
-
-     
+    const hemisphereLight = new THREE.HemisphereLight(0x606060, 0x404040);
+    scene.add(hemisphereLight);
+    
     const clock = new THREE.Clock()
     let lastElapsedTime = 0
     let rotationSpeed = -0.1
-    let mouse = {}
+    let mouse = { x: 0, y: 0 }
     window.addEventListener('mousemove',(e)=>{
         mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
         mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-        if(model){
-            model.rotation.y = THREE.MathUtils.lerp(model.rotation.y, (mouse.x * Math.PI) / 10, 0.1)
-            model.rotation.x = THREE.MathUtils.lerp(model.rotation.x, (mouse.y * Math.PI) / 10, 0.1)
-            particles.rotation.y = THREE.MathUtils.lerp(particles.rotation.y, (mouse.x * Math.PI) / 10, 0.1)
-            particles.rotation.x = THREE.MathUtils.lerp(particles.rotation.x, (mouse.y * Math.PI) / 10, 0.1)
-            particles2.rotation.y = THREE.MathUtils.lerp(particles2.rotation.y, (mouse.x * Math.PI) / 10, 0.1)
-            particles2.rotation.x = THREE.MathUtils.lerp(particles2.rotation.x, (mouse.y * Math.PI) / 10, 0.1)
-            
-            
-        }
     })
-    const tick = () =>
-    {
-        
-        const elapsedTime = clock.getElapsedTime()
-        const deltaTime = elapsedTime - lastElapsedTime
-        lastElapsedTime = elapsedTime
+    const tick = () => {
+        window.requestAnimationFrame(tick);
+    
+        const elapsedTime = clock.getElapsedTime();
+        const deltaTime = elapsedTime - lastElapsedTime;
+        lastElapsedTime = elapsedTime;
+
+        particleMaterial.uniforms.uTime.value = elapsedTime;  // This line updates the uTime uniform each frame
+
+    
         if (model && model.mixer && loaded) {
             model.mixer.update(deltaTime);
-        }    
-        // if(model){
-        //     if( model.position.z <=3.5)
-        //     model.position.z = elapsedTime*2
-        // }
-        if(loaded){
-            // setTimeout(() => {
-                for (let i = 0; i < particleCount; i++) {
-                    const sphere = particles.children[i];
-                    const targetPosition = new THREE.Vector3(
-                    targetPositions[i * 2],
-                    targetPositions[i * 2 + 1],
-                    targetPositions[i * 2 + 2]
-                    // mainPosition[i][0],
-                    // mainPosition[i][1],
-                    // mainPosition[i][2],
-                    );
-                    // sphere.scale.set(mainScales[i],mainScales[i],mainScales[i])
-                    sphere.position.lerp(targetPosition, explosionSpeed * elapsedTime);
-                }
-                for (let i = 0; i < particleCount; i++) {
-                    const sphere = particles2.children[i];
-                    const targetPosition = new THREE.Vector3(
-                    targetPositions2[i * 2],
-                    targetPositions2[i * 2 + 1],
-                    targetPositions2[i * 2 + 2]
-                    // mainPosition2[i][0],
-                    // mainPosition2[i][1],
-                    // mainPosition2[i][2],
-                    );
-                    // sphere.scale.set(mainScales2[i],mainScales2[i],mainScales2[i])
-                    sphere.position.lerp(targetPosition, explosionSpeed * elapsedTime);
-                }
-            // }, 600);
-
         }
-        
-          particles.rotation.y = elapsedTime*rotationSpeed/3
-          particles.rotation.x = -elapsedTime*rotationSpeed/3
-          particles2.rotation.y = -elapsedTime*rotationSpeed/3
-          particles2.rotation.x = -elapsedTime*rotationSpeed/3
-
+    
+        if (model) {
+            // Lerp and clamp rotation for smoother transitions and limited rotation
+            const targetRotationY = THREE.MathUtils.clamp(mouse.x * Math.PI / 10, -Math.PI / 4, Math.PI / 4);
+            const targetRotationX = THREE.MathUtils.clamp(-mouse.y * Math.PI / 10, -Math.PI / 4, Math.PI / 4);
+    
+            model.rotation.y = THREE.MathUtils.lerp(model.rotation.y, targetRotationY, 0.05);
+            model.rotation.x = THREE.MathUtils.lerp(model.rotation.x, targetRotationX, 0.05);
+        }
+    
+        if (loaded) {
+            for (let i = 0; i < particleCount; i++) {
+                const sphere = particles.children[i];
+                const targetPosition = new THREE.Vector3(
+                    targetPositions[i * 3],
+                    targetPositions[i * 3 + 1],
+                    targetPositions[i * 3 + 2]
+                );
+                sphere.position.lerp(targetPosition, explosionSpeed * elapsedTime);
+            }
+    
+            for (let i = 0; i < particleCount; i++) {
+                const sphere = particles2.children[i];
+                const targetPosition = new THREE.Vector3(
+                    targetPositions2[i * 3],
+                    targetPositions2[i * 3 + 1],
+                    targetPositions2[i * 3 + 2]
+                );
+                sphere.position.lerp(targetPosition, explosionSpeed * elapsedTime);
+            }
+        }
+    
+        particles.rotation.y = elapsedTime * rotationSpeed / 3;
+        particles.rotation.x = -elapsedTime * rotationSpeed / 3;
+        particles2.rotation.y = -elapsedTime * rotationSpeed / 3;
+        particles2.rotation.x = -elapsedTime * rotationSpeed / 3;
+    
         // Update controls
-        controls.update()
-     
+        controls.update();
+    
         // Render
-        renderer.render(scene, camera)
-
-        // Call tick again on the next frame
-        window.requestAnimationFrame(tick)
-    }
-
-    tick()
+        renderer.render(scene, camera);
+    };
+    
+    tick();

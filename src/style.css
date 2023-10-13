@@ -8,20 +8,22 @@ html,
 body
 {
     overflow: hidden;
-    background: linear-gradient(to right, #104EFF, #00E0FF) !important;
-
+    background: linear-gradient(to right, #080b16, #0b2542) !important;
+    font-family: 'Inter', sans-serif;  /* Added this line to apply the Inter font */
 }
 
 .webgl
 {
     /* background: linear-gradient(to right, #104EFF, #00E0FF); */
     background-color: #101011;
+    background: linear-gradient(to right, #080b16, #0b2542);
     position: fixed;
     top: 0;
     left: 0;
     z-index: 0;
     outline: none;
 }
+
 .loader{
     position: absolute;
     display: flex;
@@ -37,6 +39,26 @@ body
     align-items: center;
 }
 
+.loader::after {
+    content: "";
+    border: 0.2em solid transparent;
+    border-top: 0.2em solid #fff;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    animation: spin 0.75s linear infinite;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
 .container {
     position: absolute;
     left: 5%;
@@ -46,6 +68,7 @@ body
     flex-direction: column;
     justify-content: left;
     align-items:first baseline;
+    align-items: flex-start;    
     gap: 25px;
     background-color: transparent;
 }
