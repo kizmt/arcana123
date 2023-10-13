@@ -210,49 +210,63 @@ new RGBELoader()
     let left,right,head,stick
     loader.load(modelPath, (gltf) => {
         model = gltf.scene;
-        console.log(gltf)
-        head =gltf.scene.getObjectByName('Lập_Phương017')
-        right = gltf.scene.getObjectByName('Lập_Phương018')
-        left = gltf.scene.getObjectByName('Lập_Phương020')
-        stick = gltf.scene.getObjectByName('Lập_Phương025')
+        console.log(gltf);
+        head = gltf.scene.getObjectByName('Lập_Phương017');
+        right = gltf.scene.getObjectByName('Lập_Phương018');
+        left = gltf.scene.getObjectByName('Lập_Phương020');
+        stick = gltf.scene.getObjectByName('Lập_Phương025');
         // Traverse the model and update materials
         model.traverse((child) => {
             if (child.isMesh) {
-                child.material.roughness = 0.5;  // Increased roughness
-                child.material.metalness = 0.3;  // Increased metalness
+                child.material.roughness = 0.4;  // Increased roughness
+                child.material.metalness = 0.5;  // Increased metalness
                 child.material.needsUpdate = true;
             }
         });
-        model.scale.set(0.01,0.01,0.01)
-        model.position.set(0,0,4.3);  // Adjusted the z-value to bring the model closer
-        scene.add(gltf.scene);
-        let time = 1.8;  // reduced from 3 to 1.5 for a faster animation
-        let delay = 0
-        gsap.to(head.position,time,{
-            x:0,
-            y:0,
-            z:0,
-            delay:delay
-          }).then(()=>{loaded = true})
-          gsap.to(left.position,time,{
-            x:0,
-            y:0,
-            z:0,
-            delay:delay
-          })
-          gsap.to(right.position,time,{
-            x:0,
-            y:0,
-            z:0,
-            delay:delay
-          })
-          gsap.to(stick.position,time,{
-            x:0,
-            y:0,
-            z:0,
-            delay:delay
+        model.scale.set(0.01, 0.01, 0.01);
     
-          })
+        // Rotate the individual parts in reverse (45 degrees to the right)
+        if (head) {
+            head.rotation.set(0, -Math.PI / 4, 0);
+        }
+        if (right) {
+            right.rotation.set(0, -Math.PI / 4, 0);
+        }
+        if (left) {
+            left.rotation.set(0, -Math.PI / 4, 0);
+        }
+        if (stick) {
+            stick.rotation.set(0, -Math.PI / 4, 0);
+        }
+    
+        model.position.set(1, 0, 4.3); // Adjusted the z-value to bring the model closer
+        scene.add(gltf.scene);
+        let time = 1.8; // reduced from 3 to 1.5 for a faster animation
+        let delay = 0;
+        gsap.to(head.position, time, {
+            x: 0,
+            y: 0,
+            z: 0,
+            delay: delay
+        }).then(() => { loaded = true });
+        gsap.to(left.position, time, {
+            x: 0,
+            y: 0,
+            z: 0,
+            delay: delay
+        });
+        gsap.to(right.position, time, {
+            x: 0,
+            y: 0,
+            z: 0,
+            delay: delay
+        });
+        gsap.to(stick.position, time, {
+            x: 0,
+            y: 0,
+            z: 0,
+            delay: delay
+        });
     
         model.mixer = mixer;
     },

@@ -80,12 +80,12 @@ body
 .container p{
     margin-bottom: 4rem;
 font-size: 1.2rem;
-color: white;
+color: rgb(198, 216, 255);
 width: 400px;
 }
 .container h1{
     font-size: 4rem;
-    color: #71EEFF;
+    color: #b1c1f0;
     font-weight: bold;
     margin-bottom: 2rem; 
     width: 400px;
